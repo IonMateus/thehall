@@ -1,11 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chat</title>
 </head>
 <body>
-    <h1>Teste</h1>
+  <ul id="messages"></ul>
+  <form id="form" action="">
+    <input id="message-input" autocomplete="off" /><button>Send</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    document.getElementById('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value.trim();
+
+      if (message) {
+        socket.emit('message', message);
+        messageInput.value = '';
+      }
+    });
+
+    socket.on('message', (data) => {
+      const messagesList = document.getElementById('messages');
+      const listItem = document.createElement('li');
+      listItem.textContent = data;
+      messagesList.appendChild(listItem);
+    });
+  </script>
 </body>
 </html>
