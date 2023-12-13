@@ -1,0 +1,74 @@
+
+:root{
+    --gold:#B29346;
+    --green:#0B230D;
+    --wine:#390912;
+    --black:#000;
+}
+
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    text-align: center;
+    color: var(--gold);
+}
+
+body{
+    background-color: var(--black);
+    background-image: url(../images/background.png);
+    background-position-y: top;
+    background-size:cover;
+    background-repeat: no-repeat;
+}
+
+#hero{
+    padding: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}#hero *{
+    margin: 10px;
+}#hero h2{
+    font-size: 40px;
+}#hero h1{
+    font-size: 80px;
+}#hero button{
+    padding: 10px;
+    background-color: var(--wine);
+    border: 0px solid;
+    border-radius: 5px;
+    box-shadow: 0px 5px 0px var(--green);
+    width: 250px;
+    height: 50px;
+    font-size: 20px;
+    transition: all 0.1s ease;
+}#hero button:hover{
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 0px var(--green);
+    cursor: pointer;
+}#hero button:active{
+    transform: translateY(5px);
+    box-shadow: 0px 0px 0px var(--green);
+}
+
+
+
+
+
+#userSection{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    right: 0px;
+    margin: 50px;
+}
+
+
+#userBtn{
+    width: 100px;
+    height: 100px;
+    background-color: transparent;
+    border: 0px solid;
+}#userBtn:hover{cursor: pointer;}

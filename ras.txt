@@ -1,0 +1,84 @@
+HTML
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chat</title>
+</head>
+<body>
+  <ul id="messages"></ul>
+  <form id="form" action="">
+    <input id="message-input" autocomplete="off" /><button>Send</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    document.getElementById('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value.trim();
+
+      if (message) {
+        socket.emit('message', message);
+        messageInput.value = '';
+      }
+    });
+
+    socket.on('message', (data) => {
+      const messagesList = document.getElementById('messages');
+      const listItem = document.createElement('li');
+      listItem.textContent = data;
+      messagesList.appendChild(listItem);
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+Indexjs
+
+
+
+
+
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path'); 
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+app.use(express.static(path.join(__dirname)));
+
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('message', (data) => {
+      io.emit('message', data);
+    });
+});
+
+server.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
