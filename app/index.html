@@ -5,15 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real-Time Chat</title>
 
+    <link rel="stylesheet" href="../styles/app.css">
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="./scripts/client.js"></script>
     <script src="./scripts/common.js"></script>
 
 </head>
 <body>
-    <ul id="messages"></ul>
+
+    <header>
+        <h1>The Hall</h1>
+        <p>Participants: 0</p>
+        <button>+ Create +</button>
+    </header>
+
+    <button id="table">
+        <div id="tableView"></div>
+        <div id="participantsOnTable">
+            <img src="../images/userIcon.png">
+            <img src="../images/userIcon.png">
+            <img src="../images/userIcon.png">
+            <img src="../images/userIcon.png">
+        </div>
+    </button>
+    
+
+
+
+<ul id="messages"></ul>
     <form id="form" action="">
         <input id="message-input" autocomplete="off" /><button>Send</button>
     </form>
+
+    
 </body>
 </html>

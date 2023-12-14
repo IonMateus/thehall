@@ -3,6 +3,7 @@ class Client {
     constructor() {
         this.socket = io();
         this.setupEventListeners();
+        this.mask = "../../images/userIcon.png"
     }
 
     setupEventListeners() {
@@ -13,14 +14,6 @@ class Client {
 
         this.socket.on('message', (data) => {
             this.handleMessage(data);
-        });
-
-        this.socket.on('connect', () => {
-            console.log('Connected to server:', this.socket.id);
-        });
-
-        this.socket.on('disconnect', () => {
-            console.log('Disconnected from server');
         });
     }
 

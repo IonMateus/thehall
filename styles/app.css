@@ -1,0 +1,27 @@
+
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+header{
+    border: 2px solid black;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#table{
+    width: 400px;
+    height: 200px;
+}#tableView{
+    background-color: black;
+    width: 100%;
+    height: 70%;
+}#participantsOnTable{
+    display: flex;
+    width: auto;
+}#participantsOnTable img{
+    max-width: 16.5%
+}
