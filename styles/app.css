@@ -12,9 +12,10 @@ header{
     justify-content: space-between;
 }
 
-#table{
+.table{
     width: 400px;
-    height: 200px;
+    height: 280px;
+    margin: 10px;
 }#tableView{
     background-color: black;
     width: 100%;

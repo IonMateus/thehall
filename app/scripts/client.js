@@ -4,6 +4,8 @@ class Client {
         this.socket = io();
         this.setupEventListeners();
         this.mask = "../../images/userIcon.png"
+        this.requestTables()
+        this.mesa = null
     }
 
     setupEventListeners() {
@@ -15,6 +17,26 @@ class Client {
         this.socket.on('message', (data) => {
             this.handleMessage(data);
         });
+
+        this.socket.on('sendTables', (tables) => {
+            console.log(tables)
+            for(let i=0;i<tables.length;i++){
+                addTable(tables[i].name)
+            }
+        });
+
+        this.socket.on('sendTable', (table) => {
+            addTable(table.name)
+        });
+
+    }
+
+    requestTables(){
+        this.socket.emit('requestTables');
+    }
+
+    sendTable(table){
+        this.socket.emit('sendTable', table);
     }
 
     sendMessage() {
