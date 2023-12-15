@@ -5,7 +5,6 @@ class Client {
         this.setupEventListeners();
         this.mask = "../../images/userIcon.png"
         this.requestTables()
-        this.mesa = null
     }
 
     setupEventListeners() {
@@ -14,8 +13,12 @@ class Client {
             this.sendMessage();
         });
 
-        this.socket.on('message', (data) => {
-            this.handleMessage(data);
+        this.socket.on('userCounter', (value) => {
+            document.getElementById("usersCounter").innerHTML = `Participants: ${value}`
+        });
+
+        this.socket.on('message', (message) => {
+            this.handleMessage(message);
         });
 
         this.socket.on('sendTables', (tables) => {
@@ -49,11 +52,12 @@ class Client {
         }
     }
 
-    handleMessage(data) {
+    handleMessage(message) {
         const messagesList = document.getElementById('messages');
         const listItem = document.createElement('li');
-        listItem.textContent = data;
+        listItem.textContent = message;
         messagesList.appendChild(listItem);
+        messagesList.scrollTop = messagesList.scrollHeight;
     }
 }
 

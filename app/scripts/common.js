@@ -1,8 +1,8 @@
 
-let client
+let ThisClient
 
 document.addEventListener('DOMContentLoaded', function () {
-    client = new Client();
+    ThisClient = new Client();
 });
 
 
@@ -37,7 +37,7 @@ function createTable(){
     document.body.appendChild(tableBtn)
     
     let newTable = new Table(name)
-    client.sendTable(newTable)
+    ThisClient.sendTable(newTable)
     
 
 }

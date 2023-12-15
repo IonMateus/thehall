@@ -28,13 +28,7 @@ class Table {
         }
     }
 
-    showParticipants(){
-        let res = []
-        for(i in this.participants){
-            res.push({mask:this.participants[i]})
-        }
-        return res
-    }
+    canDelete(){return this.participants.length === 0}
 
 }
 
