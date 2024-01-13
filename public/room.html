@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Room</title>
+</head>
+<body>
+  <h1 id="roomName"></h1>
+  <div id="messages"></div>
+  <input id="messageInput" type="text" />
+  <button onclick="sendMessage()">Send</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const roomNameElement = document.getElementById('roomName');
+    const messagesElement = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+
+    const roomName = window.location.pathname.split('/').pop();
+    roomNameElement.innerText = `Room: ${roomName}`;
+
+    socket.emit("verifyRoom",(roomName))
+
+    socket.on("enterRoom", (roomExists) => {
+      if (roomExists) { 
+        socket.emit('joinRoom', roomName);
+        username = prompt("Username: ")
+        socket.emit("username",(username))
+      } else {
+        alert("A sala não existe");
+        document.body.innerHTML = "<h1>Dont</h1><a href='../../'>back</a>"
+      }
+    });
+    
+    socket.on('updateUsername', ({ socketId, username }) => {
+      userNames[socketId] = username;
+      // Atualize a interface do usuário conforme necessário
+    });
+    
+
+    socket.on('message', (data) => {
+      const messageElement = document.createElement('p');
+      messageElement.innerText = `${data.user}: ${data.message}`;
+      messagesElement.appendChild(messageElement);
+    });
+ 
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message) {
+        socket.emit('message', { room: roomName, message });
+        messageInput.value = '';
+      }
+    }
+
+  </script>
+</body>
+</html>

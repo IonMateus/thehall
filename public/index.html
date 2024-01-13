@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App</title>
+</head>
+<body>
+  <h1>Chat Rooms</h1>
+  <p id="numberOfClients">--</p>
+  <br>
+  <div id="roomList"></div>
+  <br>
+  <button onclick="createRoom()">Create Room</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const roomList = document.getElementById('roomList');
+
+    socket.on('updateRooms', (rooms) => {
+      roomList.innerHTML = '';
+      rooms.forEach((room) => {
+        const button = document.createElement('button');
+        button.innerText = room;
+        button.addEventListener('click', () => joinRoom(room));
+        roomList.appendChild(button);
+      });
+    });
+
+    socket.on("updateNumberOfClients",(number)=>{
+      const counter = document.getElementById("numberOfClients")
+      counter.innerHTML = number
+    })
+
+    function createRoom() {
+      const roomName = prompt('Enter room name (letters only):');
+      if (roomName) {
+        socket.emit('createRoom', roomName);
+      }
+    }
+
+    function joinRoom(roomName) {
+      window.location.href = `/room/${roomName}`;
+    }
+  </script>
+</body>
+</html>

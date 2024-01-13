@@ -2,102 +2,83 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-const { table } = require('console');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-app.use(express.static(path.join(__dirname)));
+const rooms = {};
+let numberOfClients = 0
+const userNames = {};
 
-server.listen(3000, () => {
-  console.log('Server is running on port 3000.');
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-let usersCounter = 0
-let tables = []
+app.get('/room/:roomName', (req, res) => {
+  //const roomName = req.params.roomName;
+  res.sendFile(path.join(__dirname, 'public', 'room.html'));
+});
 
 io.on('connection', (socket) => {
+  
   console.log('User connected:', socket.id);
-  usersCounter++
-  io.emit('userCounter',usersCounter)
+  numberOfClients++
+  io.emit("updateNumberOfClients", numberOfClients)
 
-  socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
-      usersCounter--
-      io.emit('userCounter',usersCounter)
+  io.emit('updateRooms', Object.keys(rooms));
+
+
+  socket.on("username", (username) => {
+    if (username) {
+      userNames[socket.id] = username;
+      io.emit('updateUsername', { socketId: socket.id, username });
+    }
+  });
+  
+
+  socket.on("verifyRoom", (roomName) => {
+    res = rooms.hasOwnProperty(roomName)
+    io.emit("enterRoom", res);
+  });
+  
+
+  socket.on('createRoom', (roomName) => {
+    if (/^[a-zA-Z]+$/.test(roomName)) {
+      rooms[roomName] = { clients: [] };
+      socket.join(roomName);
+      io.emit('updateRooms', Object.keys(rooms));
+    } else {
+      
+    }
+  });
+
+  socket.on('joinRoom', (roomName) => {
+    socket.join(roomName);
+    rooms[roomName].clients.push(socket.id);
   });
 
   socket.on('message', (data) => {
-    io.emit('message',data)
+    const senderUsername = userNames[socket.id];
+    io.to(data.room).emit('message', { user: senderUsername, message: data.message });
   });
-
-  socket.on('requestTables', () => {
-    io.to(socket.id).emit('sendTables', tables);
-    console.log("tables send")
-  });
-
-  socket.on('sendTable', (table) => {
-    tables.push(table)
-    socket.broadcast.emit('sendTable', table);
-    console.log("table", table.name)
-  });
-
-});
-
-
-
-app.get('/table/*', (req, res) => {
-  const name = req.params[0]; 
-  let index = tables.findIndex(table => table.name === name);
-  res.send(createTablePage(name,index));
-});
-
-
-function createTablePage(name,index){
-  if(index == -1){
-    return `
-      <h1>The table '${name}' doesn't exist</h1>
-      <a href='../../app'> - Back</a>
-    `
-  }else{
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hall | ${name}</title>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="../../app/scripts/client.js"></script>
-    <script src="../../app/scripts/table.js"></script>
-    
-    <link rel="stylesheet" href="../../styles/app.css">
-    
-    <script>
-      let appClient
-
-      document.addEventListener('DOMContentLoaded', function () {
-      appClient = new Client();
-});
-    </script>
-</head>
-<body>
-      
-  <h1>Table: ${name}</h1>
-  <a href='../../app'> - Back</a>
-
-  <br><br>
-
-  <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="message-input" autocomplete="off" /><button>Send</button>
-    </form>
-      
-</body>
-</html>
   
-    `
-  }
-}
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+    numberOfClients--
+    io.emit("updateNumberOfClients", numberOfClients)
+    Object.keys(rooms).forEach((room) => {
+      rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id);
+    });
+  });
+
+});
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
