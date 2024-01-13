@@ -30,11 +30,9 @@ io.on('connection', (socket) => {
 
   io.emit('updateRooms', Object.keys(rooms));
 
-
   socket.on("username", (username) => {
     if (username) {
       userNames[socket.id] = username;
-      io.emit('updateUsername', { socketId: socket.id, username });
     }
   });
   
@@ -47,7 +45,7 @@ io.on('connection', (socket) => {
 
   socket.on('createRoom', (roomName) => {
     if (/^[a-zA-Z]+$/.test(roomName)) {
-      rooms[roomName] = { clients: [] };
+      rooms[roomName] = { clients: [], numberOfClientsOnRoom: 0 };
       socket.join(roomName);
       io.emit('updateRooms', Object.keys(rooms));
     } else {
@@ -57,8 +55,14 @@ io.on('connection', (socket) => {
 
   socket.on('joinRoom', (roomName) => {
     socket.join(roomName);
-    rooms[roomName].clients.push(socket.id);
+    const room = rooms[roomName];
+    if (room && !room.clients.includes(socket.id)) {
+      room.clients.push(socket.id);
+      room.numberOfClientsOnRoom++;
+      io.to(roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom);
+    }
   });
+  
 
   socket.on('message', (data) => {
     const senderUsername = userNames[socket.id];
@@ -67,12 +71,29 @@ io.on('connection', (socket) => {
   
 
   socket.on('disconnect', () => {
+
     console.log('User disconnected:', socket.id);
+    delete userNames[socket.id]
     numberOfClients--
     io.emit("updateNumberOfClients", numberOfClients)
+
     Object.keys(rooms).forEach((room) => {
-      rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id);
+      if (rooms[room].clients.includes(socket.id)){
+        
+        rooms[room].numberOfClientsOnRoom--
+
+        if (rooms[room].numberOfClientsOnRoom === 0) {
+          delete rooms[room];
+          io.emit('updateRooms', Object.keys(rooms));
+        }else{
+          rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id);
+
+          io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom)
+        }
+
+      }
     });
+
   });
 
 });

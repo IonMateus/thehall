@@ -7,9 +7,13 @@
 </head>
 <body>
   <h1 id="roomName"></h1>
+  <p id="numberOfClientsOnRoom">--</p>
   <div id="messages"></div>
-  <input id="messageInput" type="text" />
-  <button onclick="sendMessage()">Send</button>
+  <form onsubmit="event.preventDefault()">
+    <input id="messageInput" type="text" />
+    <button onclick="sendMessage()">Send</button>
+  </form>
+  
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -28,17 +32,17 @@
         socket.emit('joinRoom', roomName);
         username = prompt("Username: ")
         socket.emit("username",(username))
+
+        
       } else {
         alert("A sala não existe");
         document.body.innerHTML = "<h1>Dont</h1><a href='../../'>back</a>"
       }
     });
     
-    socket.on('updateUsername', ({ socketId, username }) => {
-      userNames[socketId] = username;
-      // Atualize a interface do usuário conforme necessário
-    });
-    
+    socket.on("updateNumberOfClientsOnRoom", number=>{
+      document.getElementById("numberOfClientsOnRoom").innerHTML = number;
+    })
 
     socket.on('message', (data) => {
       const messageElement = document.createElement('p');

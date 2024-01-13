@@ -3,15 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat App</title>
+  <title>The Hall</title>
+
+  <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
-  <h1>Chat Rooms</h1>
-  <p id="numberOfClients">--</p>
-  <br>
+
+  <header>
+    <h1>The Hall</h1>
+    
+    <a href="./about.html">About</a>
+  </header>
+
+  <div id="infos">
+    <p id="numberOfClients">--</p>
+  </div>
+  
+  <button id="btnCreateRoom" onclick="createRoom()">+</button>
+
   <div id="roomList"></div>
-  <br>
-  <button onclick="createRoom()">Create Room</button>
+
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -23,6 +34,7 @@
       rooms.forEach((room) => {
         const button = document.createElement('button');
         button.innerText = room;
+        button.id = "btnRoom"
         button.addEventListener('click', () => joinRoom(room));
         roomList.appendChild(button);
       });
@@ -30,13 +42,14 @@
 
     socket.on("updateNumberOfClients",(number)=>{
       const counter = document.getElementById("numberOfClients")
-      counter.innerHTML = number
+      counter.innerHTML = `Clients: ${number}`
     })
 
     function createRoom() {
       const roomName = prompt('Enter room name (letters only):');
       if (roomName) {
         socket.emit('createRoom', roomName);
+        window.location.href = `./room/${roomName}`
       }
     }
 
