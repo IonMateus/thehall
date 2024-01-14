@@ -47,9 +47,12 @@
 
     function createRoom() {
       const roomName = prompt('Enter room name (letters only):');
-      if (roomName) {
-        socket.emit('createRoom', roomName);
-        window.location.href = `./room/${roomName}`
+      if(roomName !== null && roomName !== ""){
+        const password = prompt("Password: (Just confirm if you want a public room)")
+        if (roomName && password !== null) {
+          socket.emit('createRoom', {roomName: roomName, password: password});
+          window.location.href = `./room/${roomName}`
+        }
       }
     }
 

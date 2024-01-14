@@ -4,15 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat Room</title>
+
+  <link rel="stylesheet" href="../../styles/room.css">
 </head>
 <body>
+
   <h1 id="roomName"></h1>
-  <p id="numberOfClientsOnRoom">--</p>
+  <div id="infos">
+    <p id="numberOfClientsOnRoom">--</p>
+  </div>
+
   <div id="messages"></div>
+
   <form onsubmit="event.preventDefault()">
     <input id="messageInput" type="text" />
-    <button onclick="sendMessage()">Send</button>
+    <button id="btnSendMessage" onclick="sendMessage()">></button>
   </form>
+
+  <button id="back" onclick="window.location.href='../../'"><</button>
   
 
   <script src="/socket.io/socket.io.js"></script>
@@ -23,32 +32,59 @@
     const messageInput = document.getElementById('messageInput');
 
     const roomName = window.location.pathname.split('/').pop();
-    roomNameElement.innerText = `Room: ${roomName}`;
+    roomNameElement.innerText = `- ${roomName} -`;
 
     socket.emit("verifyRoom",(roomName))
 
     socket.on("enterRoom", (roomExists) => {
       if (roomExists) { 
-        socket.emit('joinRoom', roomName);
-        username = prompt("Username: ")
-        socket.emit("username",(username))
-
-        
+        const password = prompt("password", "")
+        socket.emit('joinRoom', {roomName:roomName,password:password});  
       } else {
         alert("A sala não existe");
         document.body.innerHTML = "<h1>Dont</h1><a href='../../'>back</a>"
       }
     });
+
+    socket.on("joinRoom", (data)=>{socket.emit("joinRoom", (data))})
+
+    socket.on("CanJoinRoom", res=>{
+      if(res===true){
+        username = prompt("Username: ")
+        socket.emit("username",(username))   
+      }else{
+        alert("Nao pode entrar nessa sala.")
+        window.location.href = "../../"
+      }
+    })
     
     socket.on("updateNumberOfClientsOnRoom", number=>{
-      document.getElementById("numberOfClientsOnRoom").innerHTML = number;
+      document.getElementById("numberOfClientsOnRoom").innerHTML = `Clients: ${number}`;
     })
 
     socket.on('message', (data) => {
       const messageElement = document.createElement('p');
-      messageElement.innerText = `${data.user}: ${data.message}`;
-      messagesElement.appendChild(messageElement);
+      const messageUser = document.createElement('p');
+      messageElement.innerText = `${data.message}`;
+      messageUser.innerText = `${data.user}`;
+      messageElement.className = "message";
+      messageUser.className = "user";
+    
+      const messageDiv = document.createElement('div');
+      messageDiv.className = "messageDiv";
+      messageDiv.appendChild(messageUser);
+      messageDiv.appendChild(messageElement);
+      messagesElement.appendChild(messageDiv);
+    
+      if (data.socketId === socket.id) {
+        messageDiv.style.justifyContent = 'flex-end';
+      } else {
+        messageDiv.style.justifyContent = 'flex-start';
+      }
+    
+      scrollToBottom();
     });
+    
  
     function sendMessage() {
       const message = messageInput.value.trim();
@@ -56,6 +92,12 @@
         socket.emit('message', { room: roomName, message });
         messageInput.value = '';
       }
+    }
+
+    let messageDiv = document.getElementById('messages');
+
+    function scrollToBottom() {
+      messageDiv.scrollTop = messagesElement.scrollHeight;
     }
 
   </script>

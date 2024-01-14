@@ -1,0 +1,113 @@
+
+:root{
+    --black: #04040C;
+    --whithe: #728CBF;
+    --accent: #00f7ff;
+    --normal-size: 20px;
+}
+
+*{
+    margin: 0px;
+    padding: 0px;
+    font-family:'Times New Roman', Times, serif;
+    font-weight: bold;
+    color: var(--whithe);
+    text-align: center;
+}
+
+body{
+    background-color: var(--black);
+}
+
+#infos{
+    background-color: var(--whithe);
+    position: fixed;
+    width: 120px;
+    height: 50px;
+    right: 10px;
+    bottom: 10px;
+    font-size: var(--normal-size);
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+}#infos *{
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    color: var(--black);
+}
+
+
+#messages{
+    background-color: var(--black);
+    box-shadow: 0px 0px 10px var(--accent);
+    margin: 30px;
+    border-radius: 10px;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+#messages::-webkit-scrollbar {
+    width: 10px; 
+}
+#messages::-webkit-scrollbar-thumb {
+    background-color: var(--whithe); 
+    border-radius: 10px; 
+}
+
+
+.message{
+    background-color: var(--whithe);
+    padding: 5px;
+    margin: 5px;
+    margin-inline: 10px;
+    border-radius: 10px;
+    color: var(--black);
+    display: inline-flex;
+}
+
+.user{
+    margin-bottom: 0px;
+}
+
+.messageDiv{
+    width: 100%;
+    justify-content: left;
+    display: grid;
+}
+
+#messageInput{
+    width: 200px;
+    height: 30px;
+    border-radius: 10px;
+    border: 0px solid;
+    color: var(--black);
+}
+
+#btnSendMessage{
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    border: 0px solid;
+    font-size: 10px;
+    color: var(--black);
+}
+
+#back{
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    border: 0px solid;
+    color: var(--black);
+    background-color: var(--whithe);
+    border-radius: 10px;
+    font-size: 20px;
+    transition: all 0.2s ease;
+}
+#back:hover{
+    transform:translateX(10px);
+    background-color: var(--accent);
+    cursor: pointer;
+}

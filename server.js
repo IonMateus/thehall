@@ -24,8 +24,8 @@ app.get('/room/:roomName', (req, res) => {
 
 io.on('connection', (socket) => {
   
-  console.log('User connected:', socket.id);
   numberOfClients++
+  console.log('User connected:', socket.id, " : ", numberOfClients);
   io.emit("updateNumberOfClients", numberOfClients)
 
   io.emit('updateRooms', Object.keys(rooms));
@@ -39,42 +39,54 @@ io.on('connection', (socket) => {
 
   socket.on("verifyRoom", (roomName) => {
     res = rooms.hasOwnProperty(roomName)
-    io.emit("enterRoom", res);
+    if(res){
+      if(rooms[roomName].password === ""){
+        socket.emit('joinRoom', {roomName:roomName,password:""});
+      }else{
+        socket.emit("enterRoom", true);
+      }
+    }else{
+      socket.emit("enterRoom", false);
+    }
+   
   });
   
 
-  socket.on('createRoom', (roomName) => {
-    if (/^[a-zA-Z]+$/.test(roomName)) {
-      rooms[roomName] = { clients: [], numberOfClientsOnRoom: 0 };
-      socket.join(roomName);
-      io.emit('updateRooms', Object.keys(rooms));
-    } else {
-      
+  socket.on('createRoom', (data) => {
+    if (/^[a-zA-Z]+$/.test(data.roomName)) {
+      rooms[data.roomName] = { clients: [], numberOfClientsOnRoom: 0 , password: data.password, host:null};
+      socket.join(data.roomName);
+      socket.emit('updateRooms', Object.keys(rooms));
     }
   });
 
-  socket.on('joinRoom', (roomName) => {
-    socket.join(roomName);
-    const room = rooms[roomName];
+  socket.on('joinRoom', (data) => {
+    const room = rooms[data.roomName];
     if (room && !room.clients.includes(socket.id)) {
-      room.clients.push(socket.id);
-      room.numberOfClientsOnRoom++;
-      io.to(roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom);
+      if(data.password === room.password){
+        socket.join(data.roomName);
+        room.clients.push(socket.id);
+        room.numberOfClientsOnRoom++;
+        //room.host = 1;
+        socket.emit("CanJoinRoom",true)
+        io.to(data.roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom);
+      }else{
+        socket.emit("CanJoinRoom",false)
+      }
     }
   });
   
 
   socket.on('message', (data) => {
     const senderUsername = userNames[socket.id];
-    io.to(data.room).emit('message', { user: senderUsername, message: data.message });
+    io.to(data.room).emit('message', { user: senderUsername, message: data.message , socketId:socket.id});
   });
   
 
   socket.on('disconnect', () => {
-
-    console.log('User disconnected:', socket.id);
     delete userNames[socket.id]
     numberOfClients--
+    console.log('User disconnected:', socket.id, " : ", numberOfClients);
     io.emit("updateNumberOfClients", numberOfClients)
 
     Object.keys(rooms).forEach((room) => {
@@ -90,8 +102,8 @@ io.on('connection', (socket) => {
 
           io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom)
         }
-
       }
+
     });
 
   });
@@ -101,5 +113,5 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`----------Server is running on port ${PORT}----------`);
 });
