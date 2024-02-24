@@ -5,60 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Hall</title>
 
-  <link rel="stylesheet" href="./styles/index.css">
+  <!--<link rel="stylesheet" href="./styles/index.css">-->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 </head>
-<body>
+<body class="bg-gray-900 text-white">
 
-  <header>
-    <h1>The Hall</h1>
-    
-    <a href="./about.html">About</a>
+  <header class="bg-gray-800 py-4 text-center rounded-b-lg">
+    <h1 class="text-3xl font-bold text-white">The Hall</h1>
   </header>
+  
 
-  <div id="infos">
-    <p id="numberOfClients">--</p>
+  <div id="infos" class="fixed bottom-0 left-0 p-4 bg-gray-800 text-white rounded-tl-lg rounded-tr-lg">
+    <p id="numberOfClients" class="text-lg font-bold">Clients: 0</p>
+  </div>
+
+  <button id="btnCreateRoom" onclick="createRoom()" class="fixed bottom-0 right-0 p-4 bg-gray-800 text-white rounded-tl-lg hover:bg-gray-600 transition duration-300">
+    <svg class="w-8 h-8 transform hover:rotate-90 transition duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+    </svg>
+  </button>
+
+  <div id="roomList" style="margin: 30px;flex-wrap: wrap;">
   </div>
   
-  <button id="btnCreateRoom" onclick="createRoom()">+</button>
-
-  <div id="roomList"></div>
 
 
+  <div style="display: none;" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">Formulário</h2>
+    <form action="#" method="POST">
+        <div class="mb-4">
+            <label class="block text-sm mb-2" for="room_name">Room Name</label>
+            <input class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="text" maxlength="50" id="room_name" name="room_name" pattern="[A-Za-z]+" required>
+            <p class="text-sm text-gray-400 mt-1">Somente letras são permitidas.</p>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm mb-2" for="password">Password</label>
+            <input class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="password" id="password" name="password" maxlength="30" required>
+            <p class="text-sm text-gray-400 mt-1">Até 20 caracteres.</p>
+        </div>
+        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" type="submit">Submit</button>
+    </form>
+</div>
+
+
+  
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const roomList = document.getElementById('roomList');
+  <script src="./client.js"></script>
 
-    socket.on('updateRooms', (rooms) => {
-      roomList.innerHTML = '';
-      rooms.forEach((room) => {
-        const button = document.createElement('button');
-        button.innerText = room;
-        button.id = "btnRoom"
-        button.addEventListener('click', () => joinRoom(room));
-        roomList.appendChild(button);
-      });
-    });
-
-    socket.on("updateNumberOfClients",(number)=>{
-      const counter = document.getElementById("numberOfClients")
-      counter.innerHTML = `Clients: ${number}`
-    })
-
-    function createRoom() {
-      const roomName = prompt('Enter room name (letters only):');
-      if(roomName !== null && roomName !== ""){
-        const password = prompt("Password: (Just confirm if you want a public room)")
-        if (roomName && password !== null) {
-          socket.emit('createRoom', {roomName: roomName, password: password});
-          window.location.href = `./room/${roomName}`
-        }
-      }
-    }
-
-    function joinRoom(roomName) {
-      window.location.href = `/room/${roomName}`;
-    }
-  </script>
 </body>
 </html>
