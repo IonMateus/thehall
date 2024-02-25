@@ -158,15 +158,11 @@
 
   messagesElement.scrollTop = messagesElement.scrollHeight;
 });
-
-
-    
-
  
     function sendMessage() {
       const message = messageInput.value.trim();
       if (message) {
-        socket.emit('message', { room: roomName, message });
+        socket.emit('message', { roomName, message});
         messageInput.value = '';
       }
     }
