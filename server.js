@@ -10,6 +10,8 @@ const io = socketIo(server);
 const rooms = {};
 let numberOfClients = 0
 const userNames = {};
+let access = 0
+let roomsCreated = 0
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -25,8 +27,10 @@ app.get('/room/:roomName', (req, res) => {
 io.on('connection', (socket) => {
   
   numberOfClients++
+  access++
   console.log('User connected:', socket.id, " : ", numberOfClients);
   io.emit("updateNumberOfClients", numberOfClients)
+  io.emit("updateInformations",{access,roomsCreated})
 
   io.emit('updateRooms', Object.keys(rooms));
 
@@ -58,6 +62,7 @@ io.on('connection', (socket) => {
         rooms[data.roomName] = { clients: [], numberOfClientsOnRoom: 0 , password: data.password};
         socket.join(data.roomName);
         socket.emit('updateRooms', Object.keys(rooms));
+        roomsCreated++
       }
     }
   });

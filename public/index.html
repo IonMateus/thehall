@@ -11,10 +11,22 @@
 </head>
 <body class="bg-gray-900 text-white">
 
-  <header class="bg-gray-800 py-4 text-center rounded-b-lg">
+  <header class="bg-gray-800 py-4 rounded-b-lg flex justify-around items-center">
     <h1 class="text-3xl font-bold text-white">The Hall</h1>
+    <button id="showModal" class="px-4 py-2 bg-gray-700 text-white rounded font-bold">Info</button>
   </header>
-  
+
+  <div id="modal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 hidden">
+    <button id="closeModal" class="absolute top-0 right-0 p-2 m-1 bg-gray-500 h-10 w-10 rounded text-white font-bold">&times;</button><br>
+    <p class="m-2 font-bold">The Hall</p>
+    <i class="m-2">Version 3.3</i>
+    <p class="m-2">----------------------</p>
+    <p class="m-2">- Access: 92</p>
+    <p class="m-2">- Rooms created: 3</p>
+    <i class="m-2">*Of this server</i>
+    <p class="m-2">----------------------</p>
+    <i class="m-2 font-bold">By Ion Mateus</i>
+</div>
 
   <div id="infos" class="fixed bottom-0 left-0 p-4 bg-gray-800 text-white rounded-tl-lg rounded-tr-lg">
     <p id="numberOfClients" class="text-lg font-bold">Clients: 0</p>
@@ -52,6 +64,26 @@
   
   <script src="/socket.io/socket.io.js"></script>
   <script src="./client.js"></script>
+
+  <script>
+    const showModalButton = document.getElementById('showModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const modal = document.getElementById('modal');
+
+    showModalButton.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+    });
+
+    closeModalButton.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+  </script>
 
 </body>
 </html>
