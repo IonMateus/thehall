@@ -1,4 +1,4 @@
-//import { writeFile } from "fs";
+
 const { writeFile } = require('fs');
 
 
@@ -98,9 +98,9 @@ io.on('connection', (socket) => {
   });
 
 
-  socket.on("sendImage", (file) => {
+  socket.on("sendImage", (data) => {
     const senderUsername = userNames[socket.id];
-    io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file , socketId:socket.id});
+    io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file:data.file , socketId:socket.id});
   });
   
 

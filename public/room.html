@@ -146,8 +146,6 @@
     }
 
     function sendImage(files) {
-        //var blob = new Blob([files[0]]);
-        //var imageUrl = URL.createObjectURL(blob);
         socket.emit("sendImage", {file:files[0],roomName});
     }
 
@@ -158,7 +156,7 @@
 
       const messageUser = document.createElement('p');
       if(data.file){
-var blob = new Blob(data.file);
+        var blob = new Blob([data.file]);
         var imageUrl = URL.createObjectURL(blob);
         messageElement = document.createElement("img");
         messageElement.src = imageUrl;
