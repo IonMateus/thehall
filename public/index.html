@@ -8,6 +8,8 @@
   <!--<link rel="stylesheet" href="./styles/index.css">-->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
+  <script src="./scripts/notification.js"></script>
+
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -17,15 +19,15 @@
   </header>
 
   <div id="modal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 hidden">
-    <button id="closeModal" class="absolute top-0 right-0 p-2 m-1 bg-gray-500 h-10 w-10 rounded text-white font-bold">&times;</button><br>
+    <button id="closeModal" onclick="closeInformations()" class="absolute top-0 right-0 p-2 m-1 bg-gray-500 h-10 w-10 rounded text-white font-bold">&times;</button><br>
     <p class="m-2 font-bold">The Hall</p>
     <i class="m-2">Version 3.3</i>
     <p class="m-2">----------------------</p>
-    <p class="m-2">- Access: 92</p>
-    <p class="m-2">- Rooms created: 3</p>
+    <p id="accessCounter" class="m-2">- Access: 0</p>
+    <p id="roomsCreatedCounter" class="m-2">- Rooms created: 0</p>
     <i class="m-2">*Of this server</i>
     <p class="m-2">----------------------</p>
-    <i class="m-2 font-bold">By Ion Mateus</i>
+    <i class="m-2 font-bold">By <a href="https://ionmateus.github.io" target="_blank" style="text-decoration: underline;color: aqua;">Ion Mateus</a></i>
 </div>
 
   <div id="infos" class="fixed bottom-0 left-0 p-4 bg-gray-800 text-white rounded-tl-lg rounded-tr-lg">
@@ -61,9 +63,11 @@
 </div>
 
 
+<div id="notificationsDiv" class="fixed top-0 right-0 p-4  text-white"></div>
+
   
   <script src="/socket.io/socket.io.js"></script>
-  <script src="./client.js"></script>
+  <script src=".//scripts/client.js"></script>
 
   <script>
     const showModalButton = document.getElementById('showModal');
@@ -74,15 +78,10 @@
       modal.classList.remove('hidden');
     });
 
-    closeModalButton.addEventListener('click', () => {
+    function closeInformations(){
       modal.classList.add('hidden');
-    });
+    }
 
-    window.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        modal.classList.add('hidden');
-      }
-    });
   </script>
 
 </body>

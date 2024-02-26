@@ -57,38 +57,39 @@ io.on('connection', (socket) => {
   });
   
   socket.on('createRoom', (data) => {
-    if(data && data.roomName && data.password){
-      if (/^[a-zA-Z]+$/.test(data.roomName) && !rooms.hasOwnProperty(data.roomName)) {
+      if (/^[a-zA-Z]+$/.test(data.roomName) && !roomExist(data.roomName)) {
         rooms[data.roomName] = { clients: [], numberOfClientsOnRoom: 0 , password: data.password};
         socket.join(data.roomName);
         socket.emit('updateRooms', Object.keys(rooms));
         roomsCreated++
       }
-    }
+    
   });
 
   socket.on('joinRoom', (data) => {
-    if(data && data.roomName && data.password){
       const room = rooms[data.roomName];
-      if (room && !room.clients.includes(socket.id)) {
+      if (room && !room.clients.includes(socket.id) && roomExist(data.roomName)) {
+        socket.tryToEnter = data.roomName
         if(data.password === room.password){
           socket.join(data.roomName);
           room.clients.push(socket.id);
-          room.numberOfClientsOnRoom++;
+          room.numberOfClientsOnRoom = room.clients.length;
           socket.emit("CanJoinRoom",true)
           io.to(data.roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom);
         }else{
           socket.emit("CanJoinRoom",false)
         }
       }
-    }
+    
   });
   
 
   socket.on('message', (data) => {
-    if(data && data.room && data.message){
-      const senderUsername = userNames[socket.id];
-      io.to(data.room).emit('message', { user: senderUsername, message: data.message , socketId:socket.id});
+    if(data && data.message && data.roomName && roomExist(data.roomName)){
+      if(rooms[data.roomName].clients.includes(socket.id)){
+        const senderUsername = userNames[socket.id];
+        io.to(data.roomName).emit('message', { user: senderUsername, message: data.message , socketId:socket.id});
+      }
     }
   });
   
@@ -99,22 +100,17 @@ io.on('connection', (socket) => {
     console.log('User disconnected:', socket.id, " : ", numberOfClients);
     io.emit("updateNumberOfClients", numberOfClients)
 
-    Object.keys(rooms).forEach((room) => {
-      if (rooms[room].clients.includes(socket.id)){
+    if(socket.tryToEnter){
+      const room = socket.tryToEnter
+      rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id);
+      rooms[room].numberOfClientsOnRoom = rooms[room].clients.length
+      io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom)
 
-        rooms[room].numberOfClientsOnRoom--
-        console.log('Clientes na sala sala1:', io.sockets.adapter.rooms[room]);
-
-        if (!io.sockets.adapter.rooms[room] || Object.keys(io.sockets.adapter.rooms[room]).length === 0) {
-          delete rooms[room];
-          io.emit('updateRooms', Object.keys(rooms));
-        }else{
-          rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id);
-          io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom)
-        }
+      if (rooms[room].numberOfClientsOnRoom === 0) {
+        delete rooms[room];
+        io.emit('updateRooms', Object.keys(rooms));
       }
-
-    });
+    }
 
   });
 
@@ -125,3 +121,8 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n----------Server is running on port ${PORT}----------`);
 });
+
+function roomExist(roomName){
+    if(rooms.hasOwnProperty(roomName)){return true}
+    else{return false}
+}
