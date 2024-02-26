@@ -98,9 +98,9 @@ io.on('connection', (socket) => {
   });
 
 
-  socket.on("sendImage", (data) => {
+  socket.on("sendImage", (file) => {
     const senderUsername = userNames[socket.id];
-    io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, imageUrl: data.imageUrl , socketId:socket.id});
+    io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file , socketId:socket.id});
   });
   
 
