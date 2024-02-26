@@ -1,3 +1,7 @@
+//import { writeFile } from "fs";
+const { writeFile } = require('fs');
+
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -91,6 +95,12 @@ io.on('connection', (socket) => {
         io.to(data.roomName).emit('message', { user: senderUsername, message: data.message , socketId:socket.id});
       }
     }
+  });
+
+
+  socket.on("sendImage", (data) => {
+    const senderUsername = userNames[socket.id];
+    io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, imageUrl: data.imageUrl , socketId:socket.id});
   });
   
 

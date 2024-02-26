@@ -23,7 +23,13 @@
 
   <form onsubmit="event.preventDefault()" class="flex items-center justify-between bg-gray-800 rounded-lg p-2">
     <input id="messageInput" type="text" class="flex-1 bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none">
-    <button id="btnSendMessage" onclick="sendMessage()" class="ml-2 bg-gray-700 text-white rounded-full p-2 focus:outline-none hover:bg-gray-600 transition duration-300">Enviar</button>
+    <label for="fileInput" class="ml-2 bg-gray-700 text-white rounded-full p-2 focus:outline-none hover:bg-gray-600 transition duration-300">
+      <input onchange="sendImage(this.files)" type="file" id="fileInput" class="hidden" onchange="sendMessage()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+    </label>
+        <button id="btnSendMessage" onclick="sendMessage()" class="ml-2 bg-gray-700 text-white rounded-full p-2 focus:outline-none hover:bg-gray-600 transition duration-300">Enviar</button>
   </form>
 
 
@@ -33,15 +39,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
+  
 
   <div style="display: none;" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-8 rounded-lg shadow-lg">
     <!-- Seu conteúdo aqui -->
@@ -126,38 +124,8 @@
 
 
     socket.on('message', (data) => {
-  const messageDiv = document.createElement('div');
-  messageDiv.className = "flex items-start mb-1 p-2 rounded-lg";
-
-  const messageUser = document.createElement('p');
-  const messageElement = document.createElement('p');
-
-  messageUser.innerText = `${data.user}:`;
-  messageElement.innerText = `${data.message}`;
-
-  messageUser.className = "text-gray-400 text-sm mr-2";
-  messageElement.className = "text-white";
-
-  messageDiv.appendChild(messageUser);
-  messageDiv.appendChild(messageElement);
-
-  const messagesElement = document.getElementById('messages');
-  messagesElement.appendChild(messageDiv);
-
-  messageElement.style.wordWrap = "break-word";
-
-  if (data.socketId === socket.id) {
-    messageDiv.style.justifyContent = 'flex-end';
-    messageUser.classList.add('ml-1');
-    messageElement.classList.add('bg-blue-500', 'rounded-lg', 'px-3', 'py-1');
-  } else {
-    messageDiv.style.justifyContent = 'flex-start';
-    messageUser.classList.add('mr-1');
-    messageElement.classList.add('bg-gray-700', 'rounded-lg', 'px-3', 'py-1');
-  }
-
-  messagesElement.scrollTop = messagesElement.scrollHeight;
-});
+      message(data)
+    });
  
     function sendMessage() {
       const message = messageInput.value.trim();
@@ -167,10 +135,60 @@
       }
     }
 
+    socket.on("sendImageToRoom", data => { 
+      message(data)
+  });
+
     let messageDiv = document.getElementById('messages');
 
     function scrollToBottom() {
       messageDiv.scrollTop = messagesElement.scrollHeight;
+    }
+
+    function sendImage(files) {
+        var blob = new Blob([files[0]]);
+        var imageUrl = URL.createObjectURL(blob);
+        socket.emit("sendImage", {imageUrl,roomName});
+    }
+
+    function message(data){
+      const messageDiv = document.createElement('div');
+      messageDiv.className = "flex items-start mb-1 p-2 rounded-lg";
+      let messageElement
+
+      const messageUser = document.createElement('p');
+      if(data.imageUrl){
+        messageElement = document.createElement("img");
+        messageElement.src = data.imageUrl;
+      }else{
+        messageElement = document.createElement('p');
+        messageElement.innerText = `${data.message}`;
+      }
+      
+      messageUser.innerText = `${data.user}:`;
+
+      messageUser.className = "text-gray-400 text-sm mr-2";
+      messageElement.className = "text-white";
+
+      messageDiv.appendChild(messageUser);
+      messageDiv.appendChild(messageElement);
+
+      const messagesElement = document.getElementById('messages');
+      messagesElement.appendChild(messageDiv);
+
+      messageElement.style.wordWrap = "break-word";
+
+      if (data.socketId === socket.id) {
+        messageDiv.style.justifyContent = 'flex-end';
+        messageUser.classList.add('ml-1');
+        messageElement.classList.add('bg-blue-500', 'rounded-lg', 'px-3', 'py-1');
+      } else {
+        messageDiv.style.justifyContent = 'flex-start';
+        messageUser.classList.add('mr-1');
+        messageElement.classList.add('bg-gray-700', 'rounded-lg', 'px-3', 'py-1');
+      }
+
+      messagesElement.scrollTop = messagesElement.scrollHeight;
     }
 
   </script>
