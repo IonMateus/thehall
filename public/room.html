@@ -146,9 +146,9 @@
     }
 
     function sendImage(files) {
-        var blob = new Blob([files[0]]);
-        var imageUrl = URL.createObjectURL(blob);
-        socket.emit("sendImage", {imageUrl,roomName});
+        //var blob = new Blob([files[0]]);
+        //var imageUrl = URL.createObjectURL(blob);
+        socket.emit("sendImage", {files[0],roomName});
     }
 
     function message(data){
@@ -157,9 +157,11 @@
       let messageElement
 
       const messageUser = document.createElement('p');
-      if(data.imageUrl){
+      if(data.file){
+var blob = new Blob(data.file);
+        var imageUrl = URL.createObjectURL(blob);
         messageElement = document.createElement("img");
-        messageElement.src = data.imageUrl;
+        messageElement.src = imageUrl;
       }else{
         messageElement = document.createElement('p');
         messageElement.innerText = `${data.message}`;
