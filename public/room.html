@@ -148,7 +148,7 @@
     function sendImage(files) {
         //var blob = new Blob([files[0]]);
         //var imageUrl = URL.createObjectURL(blob);
-        socket.emit("sendImage", {files[0],roomName});
+        socket.emit("sendImage", {file:files[0],roomName});
     }
 
     function message(data){
@@ -192,6 +192,7 @@ var blob = new Blob(data.file);
 
       messagesElement.scrollTop = messagesElement.scrollHeight;
     }
+    
 
   </script>
 </body>
