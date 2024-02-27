@@ -35,7 +35,7 @@
 
   <button id="back" onclick="window.location.href='../../'" class="absolute top-0 left-0 mt-4 ml-4 bg-gray-800 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">Voltar</button>
   
-
+  <div id="usernamesDiv" class="m-2"></div>
 
 
 
@@ -118,8 +118,18 @@
       }
     })
     
-    socket.on("updateNumberOfClientsOnRoom", number=>{
+    socket.on("updateNumberOfClientsOnRoom", (number, usernames)=>{
       document.getElementById("numberOfClientsOnRoom").innerHTML = `Clients: ${number}`;
+
+      const div = document.getElementById("usernamesDiv")
+      div.innerHTML = ""
+      for(i in usernames){
+        li = document.createElement("li")
+        li.innerText = usernames[i]
+        div.appendChild(li)
+      }
+      
+
     })
 
 

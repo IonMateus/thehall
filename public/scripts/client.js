@@ -21,6 +21,8 @@ socket.on('updateRooms', (roomNames) => {
 socket.on("updateInformations", (data) =>{
     let accessCounter = document.getElementById("accessCounter")
     let roomsCreatedCounter = document.getElementById("roomsCreatedCounter")
+    let messagesCounter = document.getElementById("messagesCounter")
+    messagesCounter.innerText = `- Messages: ${data.messages}`
     accessCounter.innerText = `- Access: ${data.access}`
     roomsCreatedCounter.innerText = `- Rooms created: ${data.roomsCreated}`
 })

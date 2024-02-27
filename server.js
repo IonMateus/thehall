@@ -16,6 +16,7 @@ let numberOfClients = 0
 const userNames = {};
 let access = 0
 let roomsCreated = 0
+let messages = 0
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -34,7 +35,7 @@ io.on('connection', (socket) => {
   access++
   console.log('User connected:', socket.id, " : ", numberOfClients);
   io.emit("updateNumberOfClients", numberOfClients)
-  io.emit("updateInformations",{access,roomsCreated})
+  io.emit("updateInformations",{access,roomsCreated,messages})
 
   io.emit('updateRooms', Object.keys(rooms));
 
@@ -79,7 +80,9 @@ io.on('connection', (socket) => {
           room.clients.push(socket.id);
           room.numberOfClientsOnRoom = room.clients.length;
           socket.emit("CanJoinRoom",true)
-          io.to(data.roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom);
+          var usernames = []
+          for(i in room.clients){usernames.push(userNames[room.clients[i]])}
+          io.to(data.roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom,usernames);
         }else{
           socket.emit("CanJoinRoom",false)
         }
@@ -93,6 +96,7 @@ io.on('connection', (socket) => {
       if(rooms[data.roomName].clients.includes(socket.id)){
         const senderUsername = userNames[socket.id];
         io.to(data.roomName).emit('message', { user: senderUsername, message: data.message , socketId:socket.id});
+        messages++
       }
     }
   });
@@ -114,7 +118,9 @@ io.on('connection', (socket) => {
       const room = socket.tryToEnter
       rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id);
       rooms[room].numberOfClientsOnRoom = rooms[room].clients.length
-      io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom)
+      var usernames = []
+      for(i in room.clients){usernames.push(userNames[room.clients[i]])}
+      io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom,usernames)
 
       if (rooms[room].numberOfClientsOnRoom === 0) {
         delete rooms[room];
