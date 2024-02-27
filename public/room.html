@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat Room</title>
 
-  <!--<link rel="stylesheet" href="../../styles/room.css">-->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 
 </head>
 <body class="bg-gray-900 text-white">
 
   <h1 id="roomName" class="text-3xl font-bold text-white text-center">The Hall</h1>
 
+  <button id="back" onclick="window.location.href='../../'" class="absolute top-0 left-0 mt-4 ml-4 bg-gray-800 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">Voltar</button>
+
   <div id="infos" class="fixed bottom-0 left-0 p-4 bg-gray-800 text-white rounded-tl-lg rounded-tr-lg">
     <p id="numberOfClientsOnRoom" class="text-lg font-bold">Clients: 0</p>
   </div>
 
-  <br><br><br>
+  <br><br>
   <div id="messages" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-auto" style="max-height: 500px; scroll-behavior: smooth;"></div>
   <br>
 
@@ -31,177 +33,36 @@
     </label>
         <button id="btnSendMessage" onclick="sendMessage()" class="ml-2 bg-gray-700 text-white rounded-full p-2 focus:outline-none hover:bg-gray-600 transition duration-300">Enviar</button>
   </form>
-
-
-  <button id="back" onclick="window.location.href='../../'" class="absolute top-0 left-0 mt-4 ml-4 bg-gray-800 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">Voltar</button>
   
   <div id="usernamesDiv" class="m-2"></div>
 
 
-
-  
-
-  <div style="display: none;" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-8 rounded-lg shadow-lg">
-    <!-- Seu conteúdo aqui -->
+<div id="usernameForm" style="display: none;" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-8 rounded-lg shadow-lg">
     <h2 class="text-2xl font-bold mb-4">Enter Room</h2>
-    <form action="#" method="POST">
+    <form onsubmit="event.preventDefault();Username()" method="POST">
         <div class="mb-4">
             <label class="block text-sm mb-2" for="username">Username</label>
-            <input class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="text" id="username" name="username" placeholder="Undefined" maxlength="30">
-            <p class="text-sm text-gray-400 mt-1">Máximo de 30 caracteres.</p>
+            <input id="usernameInput" class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="text" id="username" name="username" placeholder="Undefined" maxlength="30">
         </div>
-        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" type="submit">Entrar</button>
+        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" type="submit">Enter</button>
     </form>
 </div>
 
-
-<!--<div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-8 rounded-lg shadow-lg">
-  <h2 class="text-2xl font-bold mb-4">Formulário</h2>
-  <form action="#" method="POST">
+<div id="passwordForm" style="display: none;" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-8 rounded-lg shadow-lg">
+  <h2 class="text-2xl font-bold mb-4">Credentials</h2>
+  <form onsubmit="event.preventDefault();Password()" method="POST">
       <div class="mb-4">
-          <label class="block text-sm mb-2" for="username">Username</label>
-          <input class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="text" id="username" name="username" placeholder="Undefined" maxlength="30">
-          <p class="text-sm text-gray-400 mt-1">Máximo de 30 caracteres.</p>
+          <label class="block text-sm mb-2" for="username">Password</label>
+          <input id="passwordInput" class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="password" id="password" name="password" maxlength="30">
       </div>
-      <div class="mb-4">
-          <label class="block text-sm mb-2" for="password">Password</label>
-          <input class="w-full px-3 py-2 bg-gray-900 text-white rounded-md" type="password" id="password" name="password" maxlength="30" required>
-          <p class="text-sm text-gray-400 mt-1">Obrigatório. Máximo de 30 caracteres.</p>
-      </div>
-      <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" type="submit">Entrar</button>
+      <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" type="submit">Submit</button>
   </form>
-</div>-->
+</div>
 
 
 
+<script src="/socket.io/socket.io.js"></script>
+<script src="../../scripts/room.js"></script>
 
-
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const roomNameElement = document.getElementById('roomName');
-    const messagesElement = document.getElementById('messages');
-    const messageInput = document.getElementById('messageInput');
-
-    const roomName = window.location.pathname.split('/').pop();
-    roomNameElement.innerText = `- ${roomName} -`;
-
-    socket.emit("verifyRoom",(roomName))
-
-    socket.on("enterRoom", (roomExists) => {
-      if (roomExists) { 
-        const password = prompt("password", "")
-        socket.emit('joinRoom', {roomName:roomName,password:password});  
-      } else {
-        document.body.innerHTML = `
-    <div class="bg-gray-800 flex justify-center items-center h-screen">
-        <div class="bg-gray-900 rounded-lg p-8 text-white text-center animate-pulse">
-            <h1 class="text-4xl font-bold mb-4">Room does not exist</h1>
-            <a href="../../" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200">Go back</a>
-        </div>
-    </div>`;
-
-
-      }
-    });
-
-    socket.on("joinRoom", (data)=>{socket.emit("joinRoom", (data))})
-
-    socket.on("CanJoinRoom", res=>{
-      if(res===true){
-        username = prompt("Username: ")
-        socket.emit("username",(username))   
-      }else{
-        alert("Nao pode entrar nessa sala.")
-        window.location.href = "../../"
-      }
-    })
-    
-    socket.on("updateNumberOfClientsOnRoom", (number, usernames)=>{
-      document.getElementById("numberOfClientsOnRoom").innerHTML = `Clients: ${number}`;
-
-      const div = document.getElementById("usernamesDiv")
-      div.innerHTML = ""
-      for(i in usernames){
-        li = document.createElement("li")
-        li.innerText = usernames[i]
-        div.appendChild(li)
-      }
-      
-
-    })
-
-
-    socket.on('message', (data) => {
-      message(data)
-    });
- 
-    function sendMessage() {
-      const message = messageInput.value.trim();
-      if (message) {
-        socket.emit('message', { roomName, message});
-        messageInput.value = '';
-      }
-    }
-
-    socket.on("sendImageToRoom", data => { 
-      message(data)
-  });
-
-    let messageDiv = document.getElementById('messages');
-
-    function scrollToBottom() {
-      messageDiv.scrollTop = messagesElement.scrollHeight;
-    }
-
-    function sendImage(files) {
-        socket.emit("sendImage", {file:files[0],roomName});
-    }
-
-    function message(data){
-      const messageDiv = document.createElement('div');
-      messageDiv.className = "flex items-start mb-1 p-2 rounded-lg";
-      let messageElement
-
-      const messageUser = document.createElement('p');
-      if(data.file){
-        var blob = new Blob([data.file]);
-        var imageUrl = URL.createObjectURL(blob);
-        messageElement = document.createElement("img");
-        messageElement.src = imageUrl;
-      }else{
-        messageElement = document.createElement('p');
-        messageElement.innerText = `${data.message}`;
-      }
-      
-      messageUser.innerText = `${data.user}:`;
-
-      messageUser.className = "text-gray-400 text-sm mr-2";
-      messageElement.className = "text-white";
-
-      messageDiv.appendChild(messageUser);
-      messageDiv.appendChild(messageElement);
-
-      const messagesElement = document.getElementById('messages');
-      messagesElement.appendChild(messageDiv);
-
-      messageElement.style.wordWrap = "break-word";
-
-      if (data.socketId === socket.id) {
-        messageDiv.style.justifyContent = 'flex-end';
-        messageUser.classList.add('ml-1');
-        messageElement.classList.add('bg-blue-500', 'rounded-lg', 'px-3', 'py-1');
-      } else {
-        messageDiv.style.justifyContent = 'flex-start';
-        messageUser.classList.add('mr-1');
-        messageElement.classList.add('bg-gray-700', 'rounded-lg', 'px-3', 'py-1');
-      }
-
-      messagesElement.scrollTop = messagesElement.scrollHeight;
-    }
-    
-
-  </script>
 </body>
 </html>
