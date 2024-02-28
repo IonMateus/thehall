@@ -37,6 +37,11 @@ io.on('connection', (socket) => {
   socket.on("username", (username) => {
     if (username) {
       userNames[socket.id] = username
+      var usernames = []
+      for(i in rooms[socket.tryToEnter].clients){
+        usernames.push(userNames[rooms[socket.tryToEnter].clients[i]])
+      }
+      io.to(socket.tryToEnter).emit('updateUsernames', usernames)
     }
   })
 
@@ -76,9 +81,6 @@ io.on('connection', (socket) => {
           room.clients.push(socket.id)
           room.numberOfClientsOnRoom = room.clients.length
           socket.emit("CanJoinRoom",true)
-          var usernames = []
-          for(i in room.clients){usernames.push(userNames[room.clients[i]])}
-          io.to(data.roomName).emit("updateNumberOfClientsOnRoom", room.numberOfClientsOnRoom,usernames)
         }else{
           socket.emit("CanJoinRoom",false)
         }
@@ -99,13 +101,28 @@ io.on('connection', (socket) => {
 
 
   socket.on("sendImage", (data) => {
-    const senderUsername = userNames[socket.id]
-    io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file:data.file , socketId:socket.id})
+    const senderUsername = userNames[socket.id];
+    
+    if (isPNG(data.file)) {
+      io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file: data.file, socketId: socket.id });
+    } else {
+      socket.emit('notification', "Somente imagens PNG");
+    }
   })
+  
+  function isPNG(buffer) {
+    return (
+      buffer[0] === 0x89 && 
+      buffer[1] === 0x50 && 
+      buffer[2] === 0x4E && 
+      buffer[3] === 0x47    
+    )
+  }
 
 
   socket.on('disconnect', () => {
     delete userNames[socket.id]
+
     numberOfClients--
     console.log('User disconnected:', socket.id, " : ", numberOfClients);
     io.emit("updateNumberOfClients", numberOfClients)
@@ -114,16 +131,19 @@ io.on('connection', (socket) => {
       const room = socket.tryToEnter
       rooms[room].clients = rooms[room].clients.filter((client) => client !== socket.id)
       rooms[room].numberOfClientsOnRoom = rooms[room].clients.length
-      var usernames = []
-      for(i in room.clients){usernames.push(userNames[room.clients[i]])}
-      io.to(room).emit("updateNumberOfClientsOnRoom", rooms[room].numberOfClientsOnRoom,usernames)
 
       if (rooms[room].numberOfClientsOnRoom === 0) {
         delete rooms[room];
         io.emit('updateRooms', Object.keys(rooms))
+      }else{
+        var usernames = []
+        for(i in rooms[socket.tryToEnter].clients){
+          usernames.push(userNames[rooms[socket.tryToEnter].clients[i]])
+        }
+        io.to(socket.tryToEnter).emit('updateUsernames', usernames)
       }
     }
-    
+
   })
 
 

@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Room</title>
+  <title>Room</title>
 
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
-
+  <script src="../../scripts/notification.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
 
   <h1 id="roomName" class="text-3xl font-bold text-white text-center">The Hall</h1>
 
-  <button id="back" onclick="window.location.href='../../'" class="absolute top-0 left-0 mt-4 ml-4 bg-gray-800 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">Voltar</button>
+  <div id="notificationsDiv" class="fixed top-0 right-0 p-4  text-white"></div>
 
-  <div id="infos" class="fixed bottom-0 left-0 p-4 bg-gray-800 text-white rounded-tl-lg rounded-tr-lg">
-    <p id="numberOfClientsOnRoom" class="text-lg font-bold">Clients: 0</p>
-  </div>
+  <button id="back" onclick="window.location.href='../../'" class="absolute top-0 left-0 mt-4 ml-4 bg-gray-800 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">Voltar</button>
 
   <br><br>
   <div id="messages" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-auto" style="max-height: 500px; scroll-behavior: smooth;"></div>
@@ -26,7 +24,7 @@
   <form onsubmit="event.preventDefault()" class="flex items-center justify-between bg-gray-800 rounded-lg p-2">
     <input id="messageInput" type="text" class="flex-1 bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none">
     <label for="fileInput" class="ml-2 bg-gray-700 text-white rounded-full p-2 focus:outline-none hover:bg-gray-600 transition duration-300">
-      <input onchange="sendImage(this.files)" type="file" id="fileInput" class="hidden" onchange="sendMessage()">
+      <input onchange="validateImage(this)" accept=".png" type="file" id="fileInput" class="hidden" onchange="sendMessage()">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
       </svg>

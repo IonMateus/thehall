@@ -1,8 +1,6 @@
 const socket = io()
 const roomList = document.getElementById('roomList')
 
-createNotification("Test")
-
 socket.on('updateRooms', (roomNames) => {
     roomList.innerHTML = ''
     roomNames.forEach((room) => {
@@ -32,7 +30,7 @@ socket.on("updateInformations", (data) =>{
 
 socket.on("updateNumberOfClients",(number)=>{
     const counter = document.getElementById("numberOfClients")
-    counter.innerHTML = `Clients: ${number}`
+    counter.innerHTML = `Guests: ${number}`
 })
 
 
