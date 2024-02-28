@@ -22,6 +22,7 @@ socket.on("updateInformations", (data) =>{
     let accessCounter = document.getElementById("accessCounter")
     let roomsCreatedCounter = document.getElementById("roomsCreatedCounter")
     let messagesCounter = document.getElementById("messagesCounter")
+    document.getElementById("serverDate").innerText = "*Since: "+ data.serverDate + " (Server date)"
     messagesCounter.innerText = `- Messages: ${data.messages}`
     accessCounter.innerText = `- Access: ${data.access}`
     roomsCreatedCounter.innerText = `- Rooms created: ${data.roomsCreated}`

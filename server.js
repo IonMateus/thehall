@@ -13,6 +13,7 @@ let userNames = {}
 let access = 0
 let roomsCreated = 0
 let messages = 0
+let serverDate
 
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -30,7 +31,7 @@ io.on('connection', (socket) => {
   access++
   console.log('User connected:', socket.id, " : ", numberOfClients)
   io.emit("updateNumberOfClients", numberOfClients)
-  io.emit("updateInformations",{access,roomsCreated,messages})
+  io.emit("updateInformations",{access,roomsCreated,messages,serverDate})
   io.emit('updateRooms', Object.keys(rooms))
 
 
@@ -154,6 +155,9 @@ const PORT = process.env.PORT || 3000
 
 server.listen(PORT, () => {
   console.log(`\n----------Server is running on port ${PORT}----------`)
+  serverDate = new Date()
+  serverDate = serverDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  
 })
 
 function roomExist(roomName){
