@@ -105,11 +105,7 @@ function message(data){
     messageElement.src = imageUrl
   }else{
     messageElement = document.createElement('p')
-    if(data.message.includes("EspecialHack!@#")){
-      messageElement.innerHTML = `${data.message}`
-    }else{
-      messageElement.innerText = `${data.message}`
-    }
+    messageElement.innerText = `${data.message}`
   }
   
   messageUser.innerText = `${data.user}:`
