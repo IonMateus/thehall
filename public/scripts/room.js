@@ -80,17 +80,68 @@ function scrollToBottom() {
 
 
 function validateImage(input) {
-  const file = input.files[0]
+  const file = input.files[0];
   if (file) {
-      const fileName = file.name.toLowerCase()
-      if (!fileName.endsWith('.png')) {
-          createNotification("Escolha uma imagem png")
-          input.value = '';
-      } else {
-        socket.emit("sendImage", {file,roomName})
-      }
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff", "image/webp"]; // Lista de tipos MIME de imagens permitidos
+    if (allowedTypes.includes(file.type)) {
+      socket.emit("sendImage", { file, roomName });
+      input.value = '';
+    } 
   }
 }
+
+function XvalidateImage(input) {
+  const file = input.files[0];
+  if (file) {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff", "image/webp"];
+    if (allowedTypes.includes(file.type)) {
+      socket.emit("sendImage", { file, roomName });
+      input.value = '';
+    } else {
+      if (file.type.startsWith('image/')) {
+        socket.emit("sendImage", { file, roomName });
+      input.value = '';
+      } else {
+        createNotification("Invalid Image");
+        input.value = '';
+      }
+    }
+  }
+}
+
+
+function validateImage(input){
+  const file = input.files[0];
+  if (file) {
+    result = validateFile(file)
+    if(result){
+      socket.emit("sendImage", { file, roomName });
+      input.value = '';
+    }else{
+      createNotification(result)
+    }
+  }
+}
+
+function validateFile(upload) {
+  if (upload.size === 0) return "Image not uploaded correctly.";
+  if (upload.size > 2097152) { // 2MB in bytes
+    const filesize = upload.size / 1048576; // Convert bytes to Megabytes
+    return "The image you uploaded has a filesize that is too large. Please reduce your image to < 2MB. It is currently " + filesize.toFixed(2) + "MB.";
+  }
+  const allowedTypes = ["image/gif", "image/jpeg", "image/png"];
+  if (!allowedTypes.includes(upload.type)) {
+    return "Uploads of that file type are not allowed. You need a jpg, png, or gif image.";
+  }
+  const blacklist = [".php", ".phtml", ".php3", ".php4", ".ph3", ".ph4"];
+  for (let item of blacklist) {
+    if (upload.name.toLowerCase().endsWith(item)) {
+      return "Uploads with that file extension are not allowed. You need an image ending in .jpg, .png, or .gif";
+    }
+  }
+  return true; // Validation passed
+}
+
 
 function message(data){
   const messageDiv = document.createElement('div')

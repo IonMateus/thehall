@@ -102,24 +102,22 @@ io.on('connection', (socket) => {
 
 
   socket.on("sendImage", (data) => {
-    const senderUsername = userNames[socket.id];
-    
-    if (isPNG(data.file)) {
-      io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file: data.file, socketId: socket.id });
-    } else {
-      socket.emit('notification', "Somente imagens PNG");
+
+    if(data && data.file && data.roomName && roomExist(data.roomName)){
+      if(rooms[data.roomName].clients.includes(socket.id)){
+
+        const senderUsername = userNames[socket.id];
+        if ((data.file)) {
+          io.to(data.roomName).emit('sendImageToRoom', { user: senderUsername, file: data.file, socketId: socket.id });
+        } else {
+          socket.emit('notification', "Invalid Image");
+        }
+
+      }
     }
   })
-  
-  function isPNG(buffer) {
-    return (
-      buffer[0] === 0x89 && 
-      buffer[1] === 0x50 && 
-      buffer[2] === 0x4E && 
-      buffer[3] === 0x47    
-    )
-  }
 
+  
 
   socket.on('disconnect', () => {
     delete userNames[socket.id]
