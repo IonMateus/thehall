@@ -48,13 +48,14 @@ function Username(){
   document.getElementById("usernameForm").style.display = "none"
 }
 
-socket.on("updateUsernames", (usernames)=>{
+socket.on("updateUsernames", (usernames) => {
   var code = ""
   for(i in usernames){
-    code += `<li>${usernames[i]}</li>`
+    code += `<div class="user-item">${usernames[i]}</div>`
   }
   document.getElementById("usernamesDiv").innerHTML = code
-})
+});
+
 
 socket.on('message', (data) => {
   message(data)
@@ -78,7 +79,30 @@ function scrollToBottom() {
   messageDiv.scrollTop = messagesElement.scrollHeight
 }
 
+document.getElementById("usernamesDiv").addEventListener("wheel", function(event) {
+  if (event.deltaY !== 0) {
+    this.scrollLeft += event.deltaY;
+    event.preventDefault();
+  }
+});
 
+
+function validateImage(input) {
+  const file = input.files[0];
+  if (file) {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff", "image/webp"];
+    
+    if (allowedTypes.includes(file.type)) {
+      socket.emit("sendImage", { file, roomName });
+      input.value = ''; 
+    } else {
+      createNotification("Invalid image type. Please upload a valid image.");
+      input.value = ''; 
+    }
+  }
+}
+
+/*
 function validateImage(input) {
   const file = input.files[0];
   if (file) {
@@ -122,6 +146,7 @@ function validateImage(input){
     }
   }
 }
+*/
 
 function validateFile(upload) {
   if (upload.size === 0) return "Image not uploaded correctly.";
@@ -154,6 +179,7 @@ function message(data){
     var imageUrl = URL.createObjectURL(blob)
     messageElement = document.createElement("img")
     messageElement.src = imageUrl
+    messageElement.style.maxWidth = "60%";
   }else{
     messageElement = document.createElement('p')
     messageElement.innerText = `${data.message}`
