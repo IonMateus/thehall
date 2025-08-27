@@ -1,17 +1,32 @@
-# The Hall
+# 🏛️ The Hall  
 
-## Links
-https://thehall.onrender.com
+🔗 **Acesse agora:** [thehall.onrender.com](https://thehall.onrender.com)  
 
-## Description
-<p>A online chat using WebSocket.</p>
+> Um chat online em tempo real utilizando **WebSocket**.  
+Crie salas, compartilhe o link e converse de forma simples e direta.  
 
-## Images
-<img src="https://raw.githubusercontent.com/IonMateus/thehall/main/public/images/home.png"/> 
-Home <br> <br>  <br>
+---
 
-<img src="https://raw.githubusercontent.com/IonMateus/thehall/main/public/images/create.png"/>
-Creating a room <br>  <br>  <br>
+## ✨ Funcionalidades  
 
-<img src="https://raw.githubusercontent.com/IonMateus/thehall/main/public/images/chat.png"/>
-Chat <br>  <br>  <br>
+- 🖥️ Criação de salas de bate-papo privadas  
+- 🔗 Compartilhamento de link para convidar amigos  
+- 💬 Mensagens em tempo real com WebSocket  
+- 🎨 Interface simples e direta  
+
+---
+
+## 📸 Imagens  
+
+### 🏠 Home  
+<img src="https://raw.githubusercontent.com/IonMateus/thehall/main/public/images/home.png"/>  
+
+---
+
+### ➕ Criando uma sala  
+<img src="https://raw.githubusercontent.com/IonMateus/thehall/main/public/images/create.png"/>  
+
+---
+
+### 💬 Chat em tempo real  
+<img src="https://raw.githubusercontent.com/IonMateus/thehall/main/public/images/chat.png"/>  
